@@ -6,7 +6,7 @@
                 <el-button size="default" type="warning" @click="handleUpload">上传图片</el-button>
             </el-header>
             <el-main>
-                <ImagePanel ref="imagePanelRef"></ImagePanel>
+                <ImagePanel ref="imagePanelRef" :h="h"></ImagePanel>
             </el-main>
         </el-container>
         <FormDrawer ref="formDrawerUploadRef" title="上传图片" :destroyOnClose="true" :loading="loading_drawer"

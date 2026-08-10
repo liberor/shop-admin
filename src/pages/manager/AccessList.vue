@@ -2,7 +2,7 @@
     <el-card shadow="never">
         <div class="flex items-center justify-between py-5 px-5">
             <el-button type="primary" @click="handleCreate">新增</el-button>
-            <el-icon :size="24" @click="getData">
+            <el-icon :size="24" @click="getData" class="cursor-pointer">
                 <Refresh></Refresh>
             </el-icon>
         </div>
@@ -20,11 +20,15 @@
                     </div>
                     <div>
                         <el-switch :modelValue="data.status" :active-value="1" :inactive-value="0"
-                            class="mr-3"></el-switch>
+                            class="mr-3" @change="handleChangeStatus($event,data.id)"
+                            @click.stop=""></el-switch>
 
-                        <el-button type="primary" text style="padding: 5px 3px;" @click.stop="handleUpdate(data)">修改</el-button>
-                        <el-button type="primary" text style="padding: 5px 3px;">增加</el-button>
-                        <el-button type="primary" text style="padding: 5px 3px;">删除</el-button>
+                        <el-button type="primary" text style="padding: 5px 3px;"
+                            @click.stop="handleUpdate(data)">修改</el-button>
+                        <el-button type="primary" text style="padding: 5px 3px;"
+                            @click.stop="handleCreate(data.id)">增加</el-button>
+                        <el-button type="primary" text style="padding: 5px 3px;"
+                            @click.stop="handleDelete(data.id)">删除</el-button>
                     </div>
                 </div>
             </template>
@@ -33,8 +37,9 @@
             :loading="loading_drawer">
             <el-form ref="FormRef" :model="form" :rules="rules" label-width="120px" label-position="right">
                 <el-form-item label="上级菜单" prop="rule_id" class="form-item">
-                    <el-cascader v-model="form.rule_id" :options="options" :props="{children: 'child',label: 'name',value:'id',checkStrictly:true,emitPath:false}" 
-                    clearable placeholder="请选择上级菜单"/>
+                    <el-cascader v-model="form.rule_id" :options="options"
+                        :props="{ children: 'child', label: 'name', value: 'id', checkStrictly: true, emitPath: false }"
+                        clearable placeholder="请选择上级菜单" />
                 </el-form-item>
                 <el-form-item label="菜单/规则" prop="menu" class="form-item">
                     <el-radio-group v-model="form.menu">
@@ -48,7 +53,8 @@
                 <el-form-item label="菜单图标" prop="icon" class="form-item" v-show="form.menu == 1">
                     <IconSelect v-model="form.icon"></IconSelect>
                 </el-form-item>
-                <el-form-item label="前端路由" prop="frontpath" class="form-item" v-show="form.menu == 1 && form.rule_id > 0">
+                <el-form-item label="前端路由" prop="frontpath" class="form-item"
+                    v-show="form.menu == 1 && form.rule_id > 0">
                     <el-input v-model="form.frontpath"></el-input>
                 </el-form-item>
                 <el-form-item label="后端规则" prop="condition" class="form-item" v-show="form.menu == 0">
@@ -56,18 +62,14 @@
                 </el-form-item>
                 <el-form-item label="请求方式" prop="method" class="form-item" v-show="form.menu == 0">
                     <el-select v-model="form.method" placeholder="请选择请求方式" style="width: 240px">
-                        <el-option
-                        v-for="item in ['GET','POST','PUT','DELETE']"
-                        :key="item"
-                        :label="item"
-                        :value="item"
-                        />
+                        <el-option v-for="item in ['GET', 'POST', 'PUT', 'DELETE']" :key="item" :label="item"
+                            :value="item" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="排序" prop="order" class="form-item">
-                    <el-input-number v-model="form.order" :min="0" :max="1000"/>
+                    <el-input-number v-model="form.order" :min="0" :max="1000" />
                 </el-form-item>
-                
+
             </el-form>
         </FormDrawer>
     </el-card>
@@ -75,7 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getRuleList, createRule, updateRule } from '@/api/rule';
+import { getRuleList, createRule, updateRule ,updateRuleStatus,deleteRule} from '@/api/rule';
 import FormDrawer from "@/components/FormDrawer.vue"
 import IconSelect from '@/components/IconSelect.vue';
 import { ElMessage } from 'element-plus';
@@ -93,10 +95,11 @@ function getData() {
         defaultExpandedKeys.value = res.list.map(item => item.id)
         options.value = res.rules
     })
+    
 }
 getData()
 const handleNodeClick = (item) => {
-    console.log(item);
+    //console.log(item);
 
 }
 const formDrawerRef = ref()
@@ -114,50 +117,110 @@ let form = ref({
     frontpath: ""
 
 })
+
 const rules = {
-    rule_id:[{
-        type : "number"
+    rule_id: [{
+        type: "number",
+        require: true,
+        message: "invalid",
+        trigger: "blur"
     }],
-    menu:[{
-        type : "number"
+    menu: [{
+        type: "number",
+        require: true
     }],
     name: [{
-        type : "string"
+        type: "string",
+        require: true,
+        message: "invalid",
+        trigger: "blur"
     }],
     condition: [{
-        type : "string"
+        type: "string"
     }],
     method: [{
-        type : "string"
+        type: "string"
     }],
-    status:[{
-        type : "number"
+    status: [{
+        type: "number"
     }],
     order: [{
-        type : "number"
+        type: "number",
+        require: true
     }],
     icon: [{
-        type : "string"
+        type: "string"
     }],
     frontpath: [{
-        type : "string"
+        type: "string"
     }]
 }
-
-const onSubmit = ()=>{
-    createRule(form.value).then(res=>{
-        getData()
-        ElMessage({
-            type:"success",
-            message : '创建成功'
-        })
+const FormRef = ref()
+let updateId = 0
+const onSubmit = () => {
+    FormRef.value.validate(valid => {
+        if (!valid) return
+        switch (drawerTitle.value) {
+            case '新增':
+                createRule(form.value).then(res => {
+                    getData()
+                    ElMessage({
+                        type: "success",
+                        message: '创建成功'
+                    })
+                })
+                break;
+            case '修改':
+                updateRule(updateId,form.value).then(res => {
+                    getData()
+                    ElMessage({
+                        type: "success",
+                        message: '修改成功'
+                    })
+                })
+                break;
+        }
     })
 }
-const handleCreate = ()=>{
+const handleCreate = (parent = 0) => {
+    drawerTitle.value = '新增'
+    Object.assign(form.value,{
+        rule_id: parent,
+        menu: 0,
+        name: "",
+        condition: "",
+        method: "GET",
+        status: 1,
+        order: 50,
+        icon: "",
+        frontpath: ""
+    })
+    formDrawerRef.value.open()
+
+}
+const handleUpdate = (data) => {
+    drawerTitle.value = '修改'
+    updateId = data.id
+    Object.keys(form.value).forEach(k=>{form.value[k] = data[k]})
     formDrawerRef.value.open()
 }
-const handleUpdate = (data)=>{
-    formDrawerRef.value.open()
+const handleChangeStatus = (status,id)=>{
+    updateRuleStatus(id,status).then(res=>{
+        getData()
+            ElMessage({
+                type: "success",
+                message: '修改状态成功'
+            })
+    })
+}
+const handleDelete = (id)=>{
+    deleteRule(id).then(res=>{
+        getData()
+            ElMessage({
+                type: "success",
+                message: '删除成功'
+            })
+    })
 }
 </script>
 
