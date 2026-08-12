@@ -244,5 +244,4 @@ const handleTreeCheck = (...e) => {
 </script>
 
 <style scoped>
-:deep(.el-tree-node__content) {}
 </style>

@@ -1,9 +1,16 @@
-<!-- 后端返回数据为空数组,该组件没有完成编写  -->
 <template>
     <div style="user-select: none;">
         <el-card>
             <div class="p-3 flex justify-between items-center">
-                <el-button type="primary" @click="handleAdd">新增</el-button>
+                <div>
+                    <el-button type="primary" @click="handleAdd">新增</el-button>
+                    <el-popconfirm title="是否删除该规格" confirm-button-text="确认" cancel-button-text="取消"
+                        @confirm="handleDeleteSeveral()">
+                        <template #reference>
+                            <el-button type="danger" :disabled="delete_ids.length == 0">批量删除</el-button>
+                        </template>
+                    </el-popconfirm>
+                </div>
                 <el-tooltip effect="dark" content="刷新" placement="bottom">
                     <el-icon :size="20" class="cursor-pointer" @click="getData">
                         <Refresh></Refresh>
@@ -21,25 +28,25 @@
                     </template>
                 </el-skeleton>
             </template>
-            <el-table v-else :data="tableData" stripe style="width: 100%">
-                <el-table-column prop="name" label="角色名称" />
-                <el-table-column prop="desc" label="角色描述" />
-                <el-table-column label="状态" width="200">
+            <el-table v-else ref="tableRef" :data="tableData" stripe style="width: 100%" @selection-change="handleSelectionChange($event)">
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="name" label="规格名称" width="300" />
+                <el-table-column prop="default" label="规格值" />
+                <el-table-column prop="order" label="排序" width="200" />
+                <el-table-column label="状态" align="center" width="200">
                     <template #default="{ row }">
-                        <div class="flex items-center">
+                        <div class="flex items-center justify-center">
                             <el-switch :loading="row.loading" :modelValue="row.status" :active-value="1"
-                                :inactive-value="0" @change="handleChangeStatus($event, row)"
-                                :disabled="row.super == 1">
+                                :inactive-value="0" @change="handleChangeStatus($event, row)">
                             </el-switch>
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" align="center" width="250">
                     <template #default="scope">
-                        <el-button type="primary" text
-                            @click="handleUpdate(scope.row.name, scope.row.desc, scope.row.status, scope.row.id)">修改</el-button>
-                        <el-popconfirm title="是否删除该角色" confirm-button-text="确认" cancel-button-text="取消"
-                            @confirm="handleDeleteRole(scope.row.id)">
+                        <el-button type="primary" text @click="handleUpdate(scope.row)">修改</el-button>
+                        <el-popconfirm title="是否删除该规格" confirm-button-text="确认" cancel-button-text="取消"
+                            @confirm="handleDelete(scope.row.id)">
                             <template #reference>
                                 <el-button type="danger" text>删除</el-button>
                             </template>
@@ -54,15 +61,18 @@
         </el-card>
         <FormDrawer ref="formDrawerRef" @submit="onSubmit" @cancel="clearForm" :title="drawer_title"
             :destroyOnClose="true" :loading="loading_drawer">
-            <el-form ref="FormRef" :model="form" :rules="rules">
-                <el-form-item label="角色名称" prop="name" class="form-item">
+            <el-form ref="FormRef" :model="form" :rules="rules" label-width="150" label-position="right">
+                <el-form-item label="规格名称" prop="name" class="form-item" style="width: 50%;">
                     <el-input type="text" v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="角色描述" prop="desc" class="form-item">
-                    <el-input type="textarea" v-model="form.desc" :rows="20" />
+                <el-form-item label="排序" prop="order" class="form-item">
+                    <el-input-number v-model="form.order" :min="0" :max="1000" />
                 </el-form-item>
-                <el-form-item prop="status">
+                <el-form-item label="状态" prop="status" class="form-item">
                     <el-switch v-model="form.status" :active-value="1" :inactive-value="0"></el-switch>
+                </el-form-item>
+                <el-form-item label="规格值" prop="default" class="form-item">
+                    <TagInput v-model="form.default"></TagInput>
                 </el-form-item>
             </el-form>
         </FormDrawer>
@@ -73,18 +83,21 @@
 import { getSkusList, createSkus, updateSkus, deleteSkus, updateSkusStatus } from '@/api/skus';
 import { reactive, ref, watch, nextTick } from 'vue';
 import FormDrawer from '@/components/FormDrawer.vue';
+import TagInput from '@/components/TagInput.vue';
 import { ElMessage } from 'element-plus';
+import { ro } from 'element-plus/es/locales.mjs';
 let current_page = ref(1)
 let total = ref(0)
 let loading = ref(false)
 const tableData = ref([])
+let delete_ids = ref([])
 const getData = () => {
     loading.value = true
+    delete_ids.value = []
     getSkusList(current_page.value).then(res => {
         total.value = res.totalCount
         tableData.value = res.list
-        console.log(res);
-        
+
     }).finally(() => {
         loading.value = false
     })
@@ -95,19 +108,21 @@ watch(current_page, () => {
 })
 const form = reactive({
     name: '',
-    desc: '',
-    status: 1
+    status: 1,
+    default: '',
+    order: 50
 })
+
 const rules = {
     name: [{
         required: true,
-        message: "enter name",
+        message: "规格名称不能为空",
         trigger: "blur"
     },
     ],
-    desc: [{
+    default: [{
         required: true,
-        message: "enter description",
+        message: "规格值不能为空",
         trigger: "blur"
     },
     ]
@@ -120,17 +135,18 @@ let update_id = ref(0)
 const handleAdd = () => {
     Object.assign(form, {
         name: '',
-        desc: '',
-        status: 1
+        status: 1,
+        default: '',
+        order: 50
     })
-    drawer_title.value = "新增角色"
+    drawer_title.value = "新增"
     formDrawerRef.value.open()
 }
 const onSubmit = () => {
     FormRef.value.validate(valid => {
         if (!valid) return
         switch (drawer_title.value) {
-            case "新增角色":
+            case "新增":
                 loading_drawer.value = true
                 createSkus(form).then(res => {
                     getData()
@@ -143,7 +159,7 @@ const onSubmit = () => {
                     loading_drawer.value = false
                 })
                 break;
-            case "修改角色":
+            case "修改":
                 loading_drawer.value = true
                 updateSkus(update_id.value, form).then(res => {
                     getData()
@@ -159,17 +175,15 @@ const onSubmit = () => {
         }
     })
 }
-const handleUpdate = (name, desc, status, id) => {
-    drawer_title.value = "修改角色"
-    form.name = name
-    form.desc = desc
-    form.status = status
-    update_id.value = id
+const handleUpdate = (row) => {
+    drawer_title.value = "修改"
+    update_id.value = row.id
+    Object.keys(form).forEach(k => form[k] = row[k])
     formDrawerRef.value.open()
 }
-const handleDeleteRole = (id) => {
+const handleDelete = (id) => {
     loading.value = true
-    deleteSkus(id).then(res => {
+    deleteSkus([id]).then(res => {
         getData()
         ElMessage({
             message: '删除成功',
@@ -192,8 +206,21 @@ const handleChangeStatus = (status, row) => {
     })
 }
 
+const handleSelectionChange = (rows)=>{
+    delete_ids.value = rows.map(o=>o.id)
+}
+const handleDeleteSeveral = ()=>{
+    loading.value = true
+    deleteSkus(delete_ids.value).then(res => {
+        getData()
+        ElMessage({
+            message: '删除成功',
+            type: 'success',
+        })
+    }).finally(() => {
+        loading.value = false
+    })
+}
 </script>
 
-<style scoped>
-:deep(.el-tree-node__content) {}
-</style>
+<style scoped></style>
