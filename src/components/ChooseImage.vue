@@ -67,7 +67,8 @@ const close = () => {
 const submit = () => {
     if (urls.length > 0) {
         emit('update:modelValue', urls[0])
-
+    }else{
+        emit('update:modelValue', '')
     }
     close()
 }
