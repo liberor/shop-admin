@@ -180,12 +180,11 @@
 
 <script lang="ts" setup>
 import { getCategoryList } from '@/api/category';
-import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods } from '@/api/goods';
+import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,setGoodsBanner } from '@/api/goods';
 import { ref, watch } from "vue"
 import { ElMessage } from 'element-plus';
 import FormDrawer from "@/components/FormDrawer.vue"
 import ChooseImage from '@/components/ChooseImage.vue';
-import { ro } from 'element-plus/es/locales.mjs';
 const tabbars = [{
     key:'all',
     name:'全部'
@@ -254,9 +253,6 @@ const handleChangeStatus = (status) => {
         getData(current_page.value, searchForm.value)
     })
 }
-const handleOffSale = ()=>{
-    
-}
 let form = ref({
     "title":'',	 		
 	"category_id":null,
@@ -314,6 +310,15 @@ const handleUpdate = (row) => {
     drawer_title.value = "修改商品"
     Object.keys(form.value).forEach(k=>form.value[k] = row[k])
     formDrawerRef.value.open()
+}
+const handleDeleteGoods = (ids)=>{
+    deleteGoods(ids).then(res => {
+        ElMessage({
+            type: 'success',
+            message: "删除商品成功"
+        })
+        getData(current_page.value, searchForm.value)
+    })
 }
 const onSubmit = () => {
     FormRef.value.validate(valid => {
