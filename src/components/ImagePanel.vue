@@ -114,12 +114,15 @@ import {
 } from '@/api/image';
 import FormDrawer from "./FormDrawer.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-defineProps({
+const props = defineProps({
     h:{
         required:false,
     },
     needCheckbox:{
         required:false,
+        default:false
+    },
+    multi:{
         default:false
     }
 })
@@ -284,7 +287,7 @@ const handleDeleteImage = (ids) => {
 }
 let checkedImages = computed(()=>{return list_main.value.filter((o)=>{return o.checked})})
 const handleChoose = (item)=>{
-    if(item.checked && checkedImages.value.length > 1 ){
+    if(item.checked && checkedImages.value.length > 1 && props.multi === false){
         item.checked = false
         return ElMessage({
             message : '最多选择1张图片',

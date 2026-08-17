@@ -1,51 +1,100 @@
 <template>
-    <div class="flex items-center">
-        <div v-if="modelValue" class="flex items-center justify-center">
-            <el-image :src="modelValue" fit="cover" style="height: 100px;width: 100px;"
-                class="rounded border"></el-image>
+    <div v-if="multi !== true">
+        <div class="flex items-center">
+            <div v-if="modelValue" class="flex items-center justify-center">
+                <el-image :src="modelValue" fit="cover" style="height: 100px;width: 100px;"
+                    class="rounded border"></el-image>
+            </div>
+            <div class="btn ml-3" @click="open">
+                <el-icon :size="25" class=" text-gray-500">
+                    <Plus></Plus>
+                </el-icon>
+            </div>
         </div>
-        <div class="btn ml-3" @click="open">
-            <el-icon :size="25" class=" text-gray-500">
-                <Plus></Plus>
-            </el-icon>
-        </div>
-    </div>
-    <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh">
-        <div>
-            <el-container class="bg-white rounded" :style="{ height: '70vh' }">
-                <el-header class="image-header">
-                    <el-button size="default" type="primary" @click="handleAdd">新增图片分类</el-button>
-                    <el-button size="default" type="warning" @click="handleUpload">上传图片</el-button>
-                </el-header>
-                <el-main>
-                    <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose"></ImagePanel>
-                </el-main>
-            </el-container>
-            <FormDrawer ref="formDrawerUploadRef" title="上传图片" :destroyOnClose="true" :loading="loading_drawer"
-                :needButtons="false">
-                <el-upload drag :action="ImageUploadAction" :headers="{ token }" multiple name="img"
-                    :data="{ image_class_id: imagePanelRef.active }" :on-success="uploadSuccess"
-                    :on-error="uploadError">
-                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                    <div class="el-upload__text">
-                        Drop file here or <em>click to upload</em>
-                    </div>
-                    <template #tip>
-                        <div class="el-upload__tip">
-                            jpg/png files with a size less than 500kb
+        <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh">
+            <div>
+                <el-container class="bg-white rounded" :style="{ height: '70vh' }">
+                    <el-header class="image-header">
+                        <el-button size="default" type="primary" @click="handleAdd">新增图片分类</el-button>
+                        <el-button size="default" type="warning" @click="handleUpload">上传图片</el-button>
+                    </el-header>
+                    <el-main>
+                        <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose"></ImagePanel>
+                    </el-main>
+                </el-container>
+                <FormDrawer ref="formDrawerUploadRef" title="上传图片" :destroyOnClose="true" :loading="loading_drawer"
+                    :needButtons="false">
+                    <el-upload drag :action="ImageUploadAction" :headers="{ token }" multiple name="img"
+                        :data="{ image_class_id: imagePanelRef.active }" :on-success="uploadSuccess"
+                        :on-error="uploadError">
+                        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                        <div class="el-upload__text">
+                            Drop file here or <em>click to upload</em>
                         </div>
-                    </template>
-                </el-upload>
-            </FormDrawer>
+                        <template #tip>
+                            <div class="el-upload__tip">
+                                jpg/png files with a size less than 500kb
+                            </div>
+                        </template>
+                    </el-upload>
+                </FormDrawer>
+            </div>
+            <template #footer>
+                <span>
+                    <el-button @click="dialogVisible = false">Cancel</el-button>
+                    <el-button type="primary" @click="submit(multi)">OK</el-button>
+                </span>
+            </template>
+        </el-dialog>
+    </div>
+    <div v-else>
+        <div class="flex items-center">
+            <div v-if="modelValue.length > 0" class="flex items-center justify-center">
+                <el-image v-for="url in modelValue" :key="url" :src="url" fit="cover" style="height: 100px;width: 100px;"
+                    class="rounded border"></el-image>
+            </div>
+            <div class="btn ml-3" @click="open">
+                <el-icon :size="25" class=" text-gray-500">
+                    <Plus></Plus>
+                </el-icon>
+            </div>
         </div>
-        <template #footer>
-            <span>
-                <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="submit">OK</el-button>
-            </span>
-        </template>
-    </el-dialog>
-
+        <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh">
+            <div>
+                <el-container class="bg-white rounded" :style="{ height: '70vh' }">
+                    <el-header class="image-header">
+                        <el-button size="default" type="primary" @click="handleAdd">新增图片分类</el-button>
+                        <el-button size="default" type="warning" @click="handleUpload">上传图片</el-button>
+                    </el-header>
+                    <el-main>
+                        <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose" :multi="multi"></ImagePanel>
+                    </el-main>
+                </el-container>
+                <FormDrawer ref="formDrawerUploadRef" title="上传图片" :destroyOnClose="true" :loading="loading_drawer"
+                    :needButtons="false">
+                    <el-upload drag :action="ImageUploadAction" :headers="{ token }" multiple name="img"
+                        :data="{ image_class_id: imagePanelRef.active }" :on-success="uploadSuccess"
+                        :on-error="uploadError">
+                        <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                        <div class="el-upload__text">
+                            Drop file here or <em>click to upload</em>
+                        </div>
+                        <template #tip>
+                            <div class="el-upload__tip">
+                                jpg/png files with a size less than 500kb
+                            </div>
+                        </template>
+                    </el-upload>
+                </FormDrawer>
+            </div>
+            <template #footer>
+                <span>
+                    <el-button @click="dialogVisible = false">Cancel</el-button>
+                    <el-button type="primary" @click="submit(multi)">OK</el-button>
+                </span>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <script lang="js" setup>
@@ -55,7 +104,15 @@ import ImagePanel from '@/components/ImagePanel.vue';
 import FormDrawer from '@/components/FormDrawer.vue';
 import { ImageUploadAction } from "@/api/image"
 import { ElNotification } from 'element-plus';
-const props = defineProps(['modelValue'])
+const props = defineProps({
+    modelValue:{
+        default: ''
+    },
+    multi:{
+        type:Boolean,
+        default:false
+    },
+})
 const emit = defineEmits(['update:modelValue'])
 const dialogVisible = ref(false)
 const open = () => {
@@ -64,11 +121,15 @@ const open = () => {
 const close = () => {
     dialogVisible.value = false
 }
-const submit = () => {
-    if (urls.length > 0) {
-        emit('update:modelValue', urls[0])
+const submit = (multi) => {
+    if(!multi){
+        if (urls.length > 0) {
+            emit('update:modelValue', urls[0])
+        } else {
+            emit('update:modelValue', '')
+        }
     }else{
-        emit('update:modelValue', '')
+        emit('update:modelValue', urls)
     }
     close()
 }

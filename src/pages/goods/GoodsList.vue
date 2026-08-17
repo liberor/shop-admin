@@ -93,7 +93,7 @@
                         <div v-if="searchForm.tab != 'delete'" style="user-select: none;" class="operation-table-column">
                             <el-button type="primary" text @click="handleUpdate(scope.row)">修改</el-button>
                             <el-button type="primary" text>规格</el-button>
-                            <el-button type="primary" text>设置轮播图</el-button>
+                            <el-button type="primary" text @click="openBannerDrawer(scope.row.id)">设置轮播图</el-button>
                             <el-button type="primary" text>详情</el-button>
                             <el-popconfirm title="是否删除商品" confirm-button-text="确认" cancel-button-text="取消"
                                 @confirm="handleDeleteGoods([scope.row.id])">
@@ -171,6 +171,14 @@
                             <el-radio :label="0" :value="0">放入仓库</el-radio>
                             <el-radio :label="1" :value="1">立即上架</el-radio>
                         </el-radio-group>
+                    </el-form-item>
+                </el-form>
+            </FormDrawer>
+
+            <FormDrawer ref="BannerDrawerRef" @submit="BannerOnSubmit" title="设置轮播图" size="50%" destroyOnClose>
+                <el-form ref="BannerFormRef" :model="Bannerform" label-width="120" label-position="right">
+                    <el-form-item label="轮播图" prop="title" style="width: 75%;">
+                        <ChooseImage v-model="Bannerform.banners" :multi="true"></ChooseImage>
                     </el-form-item>
                 </el-form>
             </FormDrawer>
@@ -345,6 +353,29 @@ const onSubmit = () => {
                 })
                 break;
         }
+    })
+}
+
+const Bannerform = ref({
+    banners:[]
+})
+const BannerDrawerRef = ref()
+let banner_id ;
+const openBannerDrawer = (id)=>{
+    banner_id = id
+    readGoods(id).then(res=>{
+        Bannerform.value.banners = res.goodsBanner.map(o=>o.url)
+        BannerDrawerRef.value.open()
+    })
+}
+const BannerOnSubmit = ()=>{
+    setGoodsBanner(banner_id,Bannerform.value).then(res=>{
+        ElMessage({
+            type: 'success',
+            message: "设置轮播图成功"
+        })
+        BannerDrawerRef.value.close()
+        getData(current_page.value, searchForm.value)
     })
 }
 </script>

@@ -11,7 +11,7 @@
             <template #default="{ node, data }">
                 <div class="flex items-center justify-between" style="width: 100%;">
                     <div class="flex items-center">
-                        <el-tag :type="data.menu ? 'primary' : 'default'" class="mr-1">{{ data.menu ? '菜单' : '权限'
+                        <el-tag :type="data.menu ? 'primary' : 'info'" class="mr-1">{{ data.menu ? '菜单' : '权限'
                             }}</el-tag>
                         <el-icon v-if="data.icon" :size="16" class="ml-1">
                             <component :is="data.icon"></component>
