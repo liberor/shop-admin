@@ -16,7 +16,7 @@
             <el-table-column type="expand" width="30">
                 <template #default="{row}">
                     <div class="flex p-3 pl-18">
-                        <el-avatar size="50" :src="row.user.avatar" fit="fill"></el-avatar>
+                        <el-avatar :size="50" :src="row.user.avatar" fit="fill"></el-avatar>
                         <div class="flex-1 ml-4">
                             <h6 class="flex items-center">
                                 {{ row.user.nickname ||  row.user.username }}
