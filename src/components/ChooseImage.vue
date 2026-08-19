@@ -1,9 +1,13 @@
+<!-- 只能选一张图片时不传multi,v-model绑定url字符串 -->
+<!-- 能选多张图片时传 :multi = 'true',v-model绑定url字符串的数组 -->
+
 <template>
-    <div v-if="multi !== true">
+    <div v-if="multi == false">
         <div class="flex items-center">
-            <div v-if="modelValue" class="flex items-center justify-center">
+            <div v-if="modelValue" class="flex items-center justify-center relative">
                 <el-image :src="modelValue" fit="cover" style="height: 100px;width: 100px;"
                     class="rounded border"></el-image>
+                <el-icon @click="handleClose(modelValue)" class=" absolute top-[5px] right-[5px] z-10 cursor-pointer bg-white rounded-full"><circleClose></circleClose></el-icon>
             </div>
             <div class="btn ml-3" @click="open">
                 <el-icon :size="25" class=" text-gray-500">
@@ -11,7 +15,7 @@
                 </el-icon>
             </div>
         </div>
-        <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh">
+        <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh" destroy-on-close>
             <div>
                 <el-container class="bg-white rounded" :style="{ height: '70vh' }">
                     <el-header class="image-header">
@@ -19,7 +23,7 @@
                         <el-button size="default" type="warning" @click="handleUpload">上传图片</el-button>
                     </el-header>
                     <el-main>
-                        <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose"></ImagePanel>
+                        <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose" :initialChoosedImages = "modelValue"></ImagePanel>
                     </el-main>
                 </el-container>
                 <FormDrawer ref="formDrawerUploadRef" title="上传图片" :destroyOnClose="true" :loading="loading_drawer"
@@ -50,8 +54,11 @@
     <div v-else>
         <div class="flex items-center">
             <div v-if="modelValue.length > 0" class="flex items-center justify-center">
-                <el-image v-for="url in modelValue" :key="url" :src="url" fit="cover" style="height: 100px;width: 100px;"
-                    class="rounded border"></el-image>
+                <div v-for="url in modelValue" :key="url" class="flex items-center justify-center relative">
+                    <el-image :src="url" fit="cover" style="height: 100px;width: 100px;"
+                        class="rounded border"></el-image>
+                    <el-icon @click="handleClose(url)" class=" absolute top-[5px] right-[5px] z-10 cursor-pointer bg-white rounded-full"><circleClose></circleClose></el-icon>
+                </div>
             </div>
             <div class="btn ml-3" @click="open">
                 <el-icon :size="25" class=" text-gray-500">
@@ -59,7 +66,7 @@
                 </el-icon>
             </div>
         </div>
-        <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh">
+        <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh" destroy-on-close>
             <div>
                 <el-container class="bg-white rounded" :style="{ height: '70vh' }">
                     <el-header class="image-header">
@@ -67,7 +74,8 @@
                         <el-button size="default" type="warning" @click="handleUpload">上传图片</el-button>
                     </el-header>
                     <el-main>
-                        <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose" :multi="multi"></ImagePanel>
+                        <ImagePanel ref="imagePanelRef" :needCheckbox="true" @choose="handleChoose" :multi="multi"
+                        :initialChoosedImages = "modelValue"></ImagePanel>
                     </el-main>
                 </el-container>
                 <FormDrawer ref="formDrawerUploadRef" title="上传图片" :destroyOnClose="true" :loading="loading_drawer"
@@ -97,7 +105,7 @@
     </div>
 </template>
 
-<script lang="js" setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 import { useCookies } from '@vueuse/integrations/useCookies';
 import ImagePanel from '@/components/ImagePanel.vue';
@@ -174,7 +182,10 @@ let urls = []
 const handleChoose = (checkedImages) => {
     urls = checkedImages.map(o => o.url)
 }
-
+const handleClose = (url:String) => {
+    urls = urls.filter( item => item != url )
+    submit(props.multi)
+}
 </script>
 
 <style scoped>

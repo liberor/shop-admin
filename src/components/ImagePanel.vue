@@ -124,6 +124,9 @@ const props = defineProps({
     },
     multi:{
         default:false
+    },
+    initialChoosedImages:{
+        default:''
     }
 })
 const emit = defineEmits(['choose'])
@@ -232,6 +235,23 @@ function getData_main(id, page) {
             return o
         })
         total_main.value = res.totalCount
+        if(props.multi == true){
+            for(let item of list_main.value ){
+                for(let url of props.initialChoosedImages){
+                    if(item.url == url){
+                        item.checked = true
+                        break
+                    }
+                }
+            }
+        }else{
+            for(let item of list_main.value ){
+                if(item.url == props.initialChoosedImages){
+                    item.checked = true
+                    break
+                }
+            }
+        }
     })
     .catch(err=>{
         list_main.value = []
