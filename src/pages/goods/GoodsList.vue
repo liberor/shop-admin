@@ -46,7 +46,7 @@
 
                 <el-tooltip effect="dark" content="刷新" placement="bottom">
                     <el-icon :size="20" class="cursor-pointer"
-                        @click="getData(current_page, { limit: 10, keyword: searchForm.keyword })">
+                        @click="getData(current_page, searchForm)">
                         <Refresh></Refresh>
                     </el-icon>
                 </el-tooltip>
@@ -92,9 +92,9 @@
                     <template #default="scope">
                         <div v-if="searchForm.tab != 'delete'" style="user-select: none;" class="operation-table-column">
                             <el-button type="primary" text @click="handleUpdate(scope.row)">修改</el-button>
-                            <el-button type="primary" text>规格</el-button>
-                            <el-button type="primary" text @click="openBannerDrawer(scope.row.id)">设置轮播图</el-button>
-                            <el-button type="primary" text>详情</el-button>
+                            <el-button type="primary" text @click="openSkusDrawer(scope.row)">规格</el-button>
+                            <el-button :type="scope.row.goods_banner.length == 0 ? 'danger':'primary'" text @click="openBannerDrawer(scope.row.id)">设置轮播图</el-button>
+                            <el-button :type="!scope.row.content ? 'danger':'primary'" text @click="openContentDrawer(scope.row)">详情</el-button>
                             <el-popconfirm title="是否删除商品" confirm-button-text="确认" cancel-button-text="取消"
                                 @confirm="handleDeleteGoods([scope.row.id])">
                                 <template #reference>
@@ -110,7 +110,7 @@
                 <el-pagination background v-model:current-page="current_page" layout="prev, pager, next" :total="total"
                     :page-size="10" />
             </div>
-            <FormDrawer ref="formDrawerRef" @submit="onSubmit" :title="drawer_title">
+            <FormDrawer ref="formDrawerRef" @submit="onSubmit" :title="drawer_title" >
                 <el-form ref="FormRef" :model="form" label-width="200" label-position="right" class="text-xl">
                     <el-form-item label="商品名称" prop="title" style="width: 75%;">
                         <el-input type="text" v-model="form.title" placeholder="不能超过60个字符"></el-input>
@@ -182,17 +182,71 @@
                     </el-form-item>
                 </el-form>
             </FormDrawer>
+
+            <FormDrawer ref="ContentDrawerRef" @submit="ContentOnSubmit" title="设置商品详情" size="40%" destroyOnClose>
+                <el-form ref="ContentFormRef" :model="Contentform">
+                    <el-form-item prop="title">
+                        <Editor v-model="Contentform.content"></Editor>
+                    </el-form-item>
+                </el-form>
+            </FormDrawer>
+
+            <FormDrawer ref="SkusDrawerRef" @submit="SkusOnSubmit" title="设置规格" size="60%" destroyOnClose>
+                <el-form ref="SkusFormRef" :model="Skusform" label-width="150" label-position="right">
+                    <el-form-item label="规格类型" prop="sku_type">
+                        <el-radio-group v-model="Skusform.sku_type">
+                            <el-radio label="单规格" :value="0"></el-radio>
+                            <el-radio label="多规格" :value="1"></el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <template v-if="Skusform.sku_type == 0">
+                        <el-form-item label="市场价格" style="width: 36%;">
+                            <el-input v-model="Skusform.sku_value.oprice">
+                                <template #append>元</template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="销售价格" style="width: 36%;">
+                            <el-input v-model="Skusform.sku_value.pprice">
+                                <template #append>元</template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="成本价格" style="width: 36%;">
+                            <el-input v-model="Skusform.sku_value.cprice">
+                                <template #append>元</template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="商品重量" style="width: 36%;">
+                            <el-input v-model="Skusform.sku_value.weight">
+                                <template #append>公斤</template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="商品体积" style="width: 36%;">
+                            <el-input v-model="Skusform.sku_value.volume">
+                                <template #append>立方米</template>
+                            </el-input>
+                        </el-form-item>
+                    </template>
+                    <template v-else>
+                        <el-form-item class="flex-wrap" label="规格选项" style="width: 80%;">
+                            <SkuCard></SkuCard>
+                            <el-button type="success">添加规格</el-button>
+                        </el-form-item>
+                    </template>
+                </el-form>
+            </FormDrawer>
         </el-card>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { getCategoryList } from '@/api/category';
-import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,setGoodsBanner } from '@/api/goods';
+import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,setGoodsBanner,updateGoodsSkus } from '@/api/goods';
 import { ref, watch } from "vue"
 import { ElMessage } from 'element-plus';
 import FormDrawer from "@/components/FormDrawer.vue"
 import ChooseImage from '@/components/ChooseImage.vue';
+import Editor from '@/components/Editor.vue';
+import SkuCard from './components/SkuCard.vue';
 const tabbars = [{
     key:'all',
     name:'全部'
@@ -226,7 +280,6 @@ function getData(page = 1, data = {}) {
     tableData.value = []
     getGoodsList(page, data).then(res => {
         tableData.value = res.list
-        tableData.value.forEach(item => { item.loading = false })
         total.value = res.totalCount
         roles.value = res.roles
     })
@@ -375,6 +428,63 @@ const BannerOnSubmit = ()=>{
             message: "设置轮播图成功"
         })
         BannerDrawerRef.value.close()
+        getData(current_page.value, searchForm.value)
+    })
+}
+
+const Contentform = ref({
+    content:''
+})
+const ContentDrawerRef = ref()
+let content_id ;
+const openContentDrawer=(row)=>{
+    content_id = row.id
+    Contentform.value.content = row.content
+    ContentDrawerRef.value.open()
+}
+const ContentOnSubmit = ()=>{
+    updateGoods(content_id,Contentform.value).then(res=>{
+        ElMessage({
+            type: 'success',
+            message: "设置详情成功"
+        })
+        ContentDrawerRef.value.close()
+        getData(current_page.value, searchForm.value)
+    })
+}
+
+
+const Skusform = ref({
+    "sku_type": 0,
+    "sku_value": {
+        "oprice": 0,
+        "pprice": 0,
+        "cprice": 0,
+        "weight": 0,
+        "volume": 0
+    },
+})
+const SkusDrawerRef = ref()
+let skus_id ;
+const openSkusDrawer=(row)=>{
+    skus_id = row.id
+    Skusform.value.sku_type = row.sku_type
+    Skusform.value.sku_value = row.sku_value || {
+        "oprice": 0,
+        "pprice": 0,
+        "cprice": 0,
+        "weight": 0,
+        "volume": 0
+    }
+    SkusDrawerRef.value.open()
+}
+const SkusOnSubmit = ()=>{
+    updateGoodsSkus(skus_id,Skusform.value).then(res=>{
+        ElMessage({
+            type: 'success',
+            message: "设置规格成功"
+        })
+        SkusDrawerRef.value.close()
         getData(current_page.value, searchForm.value)
     })
 }

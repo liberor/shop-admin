@@ -3,7 +3,7 @@
 
 <template>
     <div v-if="multi == false">
-        <div class="flex items-center">
+        <div class="flex items-center" v-show="preview">
             <div v-if="modelValue" class="flex items-center justify-center relative">
                 <el-image :src="modelValue" fit="cover" style="height: 100px;width: 100px;"
                     class="rounded border"></el-image>
@@ -52,18 +52,18 @@
         </el-dialog>
     </div>
     <div v-else>
-        <div class="flex items-center">
-            <div v-if="modelValue.length > 0" class="flex items-center justify-center">
-                <div v-for="url in modelValue" :key="url" class="flex items-center justify-center relative">
+        <div class="flex items-center" v-show="preview">
+            <div class="flex flex-wrap" style="user-select: none;max-width: 400px;">
+                <div v-for="url in modelValue" :key="url" class="flex items-center justify-center relative mr-1 mb-1">
                     <el-image :src="url" fit="cover" style="height: 100px;width: 100px;"
                         class="rounded border"></el-image>
                     <el-icon @click="handleClose(url)" class=" absolute top-[5px] right-[5px] z-10 cursor-pointer bg-white rounded-full"><circleClose></circleClose></el-icon>
                 </div>
-            </div>
-            <div class="btn ml-3" @click="open">
-                <el-icon :size="25" class=" text-gray-500">
-                    <Plus></Plus>
-                </el-icon>
+                <div class="btn" @click="open">
+                    <el-icon :size="25" class=" text-gray-500">
+                        <Plus></Plus>
+                    </el-icon>
+                </div>
             </div>
         </div>
         <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh" destroy-on-close>
@@ -120,6 +120,10 @@ const props = defineProps({
         type:Boolean,
         default:false
     },
+    preview:{
+        type:Boolean,
+        default:true
+    }
 })
 const emit = defineEmits(['update:modelValue'])
 const dialogVisible = ref(false)
@@ -186,6 +190,8 @@ const handleClose = (url:String) => {
     urls = urls.filter( item => item != url )
     submit(props.multi)
 }
+
+defineExpose({open})
 </script>
 
 <style scoped>
