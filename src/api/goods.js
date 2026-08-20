@@ -32,3 +32,9 @@ export function setGoodsBanner(id,data){
 export function updateGoodsSkus(id,data){
     return axios.post(`/admin/goods/updateskus/${id}`,data)
 }
+export function restoreGoods(ids){
+    return axios.post(`/admin/goods/restore`,{ids})
+}
+export function destroyGoods(ids){
+    return axios.post(`/admin/goods/destroy`,{ids})
+}

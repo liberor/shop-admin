@@ -30,18 +30,22 @@
             </el-form>
             <div class="p-3 flex justify-between items-center">
                 <div>
-                    <el-button type="primary" @click="handleAdd">新增</el-button>
+                    <el-button v-if="searchForm.tab != 'delete'" type="primary" @click="handleAdd">新增</el-button>
                     <el-popconfirm
                         title="是否删除选中商品"
                         confirmButtonText="删除"
                         cancelButtonText="取消"
                         @confirm="handleDeleteGoods(selected_ids)">
                         <template #reference>
-                            <el-button type="danger" :disabled="selected_ids.length == 0">批量删除</el-button>
+                            <el-button type="danger" v-if="searchForm.tab != 'delete'" :disabled="selected_ids.length == 0">批量删除</el-button>
                         </template>
                     </el-popconfirm>
                     <el-button v-if="searchForm.tab == 'all' || searchForm.tab == 'off'" :disabled="selected_ids.length == 0" @click="handleChangeStatus(1)">批量上架</el-button>
                     <el-button v-if="searchForm.tab == 'all' || searchForm.tab == 'saling'" :disabled="selected_ids.length == 0" @click="handleChangeStatus(0)">批量下架</el-button>
+                    
+                    <el-button v-if="searchForm.tab == 'delete'" type="warning" :disabled="selected_ids.length == 0" @click="handleRestore">批量恢复</el-button>
+                    <el-button v-if="searchForm.tab == 'delete'" type="danger" :disabled="selected_ids.length == 0" @click="handleDeleteForever">彻底删除</el-button>
+                    
                 </div>
 
                 <el-tooltip effect="dark" content="刷新" placement="bottom">
@@ -52,7 +56,7 @@
                 </el-tooltip>
             </div>
             <el-table :data="tableData" stripe style="width: 100%" @selection-change="handleSelectionChange">
-                <el-table-column type="selection" v-if="searchForm.tab != 'delete'" width="60"></el-table-column>
+                <el-table-column type="selection" width="60"></el-table-column>
                 <el-table-column label="商品" width="300">
                     <template #default="{ row }">
                         <div class="flex">
@@ -240,9 +244,9 @@
 
 <script lang="ts" setup>
 import { getCategoryList } from '@/api/category';
-import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,setGoodsBanner,updateGoodsSkus } from '@/api/goods';
+import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,setGoodsBanner,updateGoodsSkus,restoreGoods,destroyGoods } from '@/api/goods';
 import { ref, watch } from "vue"
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import FormDrawer from "@/components/FormDrawer.vue"
 import ChooseImage from '@/components/ChooseImage.vue';
 import Editor from '@/components/Editor.vue';
@@ -486,6 +490,36 @@ const SkusOnSubmit = ()=>{
         })
         SkusDrawerRef.value.close()
         getData(current_page.value, searchForm.value)
+    })
+}
+
+const handleRestore = ()=>{
+    restoreGoods(selected_ids.value).then(res=>{
+        ElMessage({
+            type:'success',
+            message:"选中商品已恢复"
+        })
+        getData(current_page.value, searchForm.value)
+    })
+}
+const handleDeleteForever = ()=>{
+    ElMessageBox.confirm("是否彻底删除选中商品?",{
+        type:'warning',
+        confirmButtonText:"确定",
+        cancelButtonText:"取消"
+    }).then(()=>{
+        restoreGoods(selected_ids.value).then(res=>{
+            ElMessage({
+                type:'success',
+                message:"选中商品已彻底删除"
+            })
+            getData(current_page.value, searchForm.value)
+        })
+    }).catch(()=>{
+        ElMessage({
+            type:'info',
+            message:"已取消操作"
+        })
     })
 }
 </script>
