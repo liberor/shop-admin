@@ -84,8 +84,8 @@
                 <el-table-column v-if="searchForm.tab != 'delete'" label="审核状态" width="220" align="center">
                     <template #default="{ row }">
                         <div class="check-status-table-column flex flex-col items-center" v-if="row.ischeck == 0">
-                            <el-button type="success" plain size="small">审核通过</el-button>
-                            <el-button type="danger" plain class="mt-2" size="small">审核拒绝</el-button>
+                            <el-button type="success" plain size="small" @click="handleCheckGoods(row.id,1)">审核通过</el-button>
+                            <el-button type="danger" plain class="mt-2" size="small" @click="handleCheckGoods(row.id,2)">审核拒绝</el-button>
                         </div>
                         <span v-else :class="{' text-green-400':row.ischeck == 1,' text-rose-400':row.ischeck == 2}">{{ row.ischeck == 1? '已通过':'已拒绝' }}</span>
                     </template>
@@ -96,9 +96,9 @@
                     <template #default="scope">
                         <div v-if="searchForm.tab != 'delete'" style="user-select: none;" class="operation-table-column">
                             <el-button type="primary" text @click="handleUpdate(scope.row)">修改</el-button>
-                            <el-button type="primary" text @click="openSkusDrawer(scope.row)">规格</el-button>
+                            <el-button :type="scope.row.sku_value == null ? 'danger':'primary'" text @click="openSkusDrawer(scope.row)">商品规格</el-button>
                             <el-button :type="scope.row.goods_banner.length == 0 ? 'danger':'primary'" text @click="openBannerDrawer(scope.row.id)">设置轮播图</el-button>
-                            <el-button :type="!scope.row.content ? 'danger':'primary'" text @click="openContentDrawer(scope.row)">详情</el-button>
+                            <el-button :type="!scope.row.content ? 'danger':'primary'" text @click="openContentDrawer(scope.row)">商品详情</el-button>
                             <el-popconfirm title="是否删除商品" confirm-button-text="确认" cancel-button-text="取消"
                                 @confirm="handleDeleteGoods([scope.row.id])">
                                 <template #reference>
@@ -233,7 +233,10 @@
                     <template v-else>
                         <el-form-item class="flex-wrap" label="规格选项" style="width: 80%;">
                             <SkuCard></SkuCard>
-                            <el-button type="success">添加规格</el-button>
+                            <el-button type="success" @click="addSkuCard">添加规格</el-button>
+                        </el-form-item>
+                        <el-form-item label="规格设置" style="width: 90%;">
+                            <SkuTable></SkuTable>
                         </el-form-item>
                     </template>
                 </el-form>
@@ -244,13 +247,19 @@
 
 <script lang="ts" setup>
 import { getCategoryList } from '@/api/category';
-import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,setGoodsBanner,updateGoodsSkus,restoreGoods,destroyGoods } from '@/api/goods';
+import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,
+    setGoodsBanner,updateGoodsSkus,restoreGoods,destroyGoods,checkGoods,createGoodsSkusCard,updateGoodsSkusCard,
+    deleteGoodsSkusCard,sortGoodsSkusCard,updateGoodsSkusCardValue,deleteGoodsSkusCardValue,
+    createGoodsSkusCardValue } from '@/api/goods';
 import { ref, watch } from "vue"
 import { ElMessage, ElMessageBox } from 'element-plus';
 import FormDrawer from "@/components/FormDrawer.vue"
 import ChooseImage from '@/components/ChooseImage.vue';
 import Editor from '@/components/Editor.vue';
 import SkuCard from './components/SkuCard.vue';
+import SkuTable from './components/SkuTable.vue';
+import useGoodsSkuStore from '@/store/useGoodsSkuStore.js';
+const GoodsSkuStore = useGoodsSkuStore()
 const tabbars = [{
     key:'all',
     name:'全部'
@@ -471,6 +480,10 @@ const Skusform = ref({
 const SkusDrawerRef = ref()
 let skus_id ;
 const openSkusDrawer=(row)=>{
+    console.log(row);
+    
+    GoodsSkuStore.goods_skus_card = row.goods_skus_card
+    GoodsSkuStore.goods_skus = row.goods_skus
     skus_id = row.id
     Skusform.value.sku_type = row.sku_type
     Skusform.value.sku_value = row.sku_value || {
@@ -483,7 +496,7 @@ const openSkusDrawer=(row)=>{
     SkusDrawerRef.value.open()
 }
 const SkusOnSubmit = ()=>{
-    updateGoodsSkus(skus_id,Skusform.value).then(res=>{
+    updateGoodsSkus(skus_id,Skusform.value.sku_type == 0 ? Skusform.value : {sku_type:1,"goodsSkus":GoodsSkuStore.goods_skus}).then(res=>{
         ElMessage({
             type: 'success',
             message: "设置规格成功"
@@ -508,7 +521,7 @@ const handleDeleteForever = ()=>{
         confirmButtonText:"确定",
         cancelButtonText:"取消"
     }).then(()=>{
-        restoreGoods(selected_ids.value).then(res=>{
+        destroyGoods(selected_ids.value).then(res=>{
             ElMessage({
                 type:'success',
                 message:"选中商品已彻底删除"
@@ -522,6 +535,60 @@ const handleDeleteForever = ()=>{
         })
     })
 }
+
+const handleCheckGoods = (id,ischeck)=>{
+    checkGoods(id,ischeck).then(res=>{
+        ElMessage({
+            type:'success',
+            message:ischeck?"商品已通过审核":"商品未通过审核"
+        })
+        getData(current_page.value, searchForm.value)
+    })
+}
+
+//添加规格选项
+const addSkuCard = ()=>{
+    createGoodsSkusCard({
+        goods_id: skus_id,
+        name: "规格选项",
+        order: 50,
+        type: 0,
+    }).then(res=>{
+        res.goods_skus_card_value = []
+        GoodsSkuStore.create_sku(res)
+    })
+}
+
+//修改规格选项
+// const updateSkuCard = ()=>{
+//     updateGoodsSkusCard(  ,{
+//         goods_id: ,
+//         name: "规格选项",
+//         order: ,
+//         type: ,
+//     }).then(res=>{
+
+//     })
+// }
+
+//修改规格选项
+// const deleteSkuCard = ()=>{
+//     deleteGoodsSkusCard(  ).then(res=>{
+
+//     })
+// }
+//排序规格选项
+// const sortSkuCard = ()=>{
+//     sortGoodsSkusCard({}).then(res=>{
+
+//     })
+// }
+//添加值
+// createGoodsSkusCardValue
+//修改值
+// updateGoodsSkusCardValue
+//删除值
+// deleteGoodsSkusCardValue
 </script>
 
 <style scoped>

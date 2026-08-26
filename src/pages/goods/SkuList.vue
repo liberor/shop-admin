@@ -85,7 +85,6 @@ import { reactive, ref, watch, nextTick } from 'vue';
 import FormDrawer from '@/components/FormDrawer.vue';
 import TagInput from '@/components/TagInput.vue';
 import { ElMessage } from 'element-plus';
-import { ro } from 'element-plus/es/locales.mjs';
 let current_page = ref(1)
 let total = ref(0)
 let loading = ref(false)
