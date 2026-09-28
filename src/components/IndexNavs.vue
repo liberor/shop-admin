@@ -2,11 +2,11 @@
     <el-row :gutter="20" class=" mt-5">
         <el-col :span="3" :offset="0" v-for="(item,index) in iconNavs" :key="index">
             <el-card shadow="hover" class="flex justify-center items-center cursor-pointer" @click="router.push(item.path)">
-                <div style="text-align: center;">
-                    <el-icon :size="20" :class="item.color">
+                <div style="text-align: center;" class="h-[10vh] pt-[3vh]">
+                    <el-icon :size="30" :class="item.color">
                         <component :is="item.icon"></component>
                     </el-icon>
-                    <div class=" text-sm mt-2">{{ item.title }}</div>
+                    <div class=" text-xl mt-2">{{ item.title }}</div>
                 </div>
             </el-card>
         </el-col>

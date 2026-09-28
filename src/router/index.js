@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import Index from "@/pages/index.vue";
 import Login from "@/pages/login.vue";
 import NotFound from "@/pages/404.vue"
 import { useCookies } from "@vueuse/integrations/useCookies";
@@ -7,25 +6,6 @@ import { getInfo } from "@/api/manager";
 import useLoginStore from "@/store/useLoginStore";
 import nprogress from "nprogress";
 import Admin from "../layouts/admin.vue";
-
-import GoodsList from "@/pages/goods/GoodsList.vue"
-import CategoryList from "@/pages/goods/CategoryList.vue"
-import SkuList from "@/pages/goods/SkuList.vue"
-import CouponList from "@/pages/goods/CouponList.vue"
-import UserList from "@/pages/user/UserList.vue"
-import LevelList from "@/pages/user/LevelList.vue"
-import OrderList from "@/pages/order/OrderList.vue"
-import CommentList from "@/pages/order/CommentList.vue"
-import ManagerList from "@/pages/manager/ManagerList.vue"
-import RoleList from "@/pages/manager/RoleList.vue"
-import AccessList from "@/pages/manager/AccessList.vue"
-import SettingBase from "@/pages/settings/SettingBase.vue"
-import SettingBuy from "@/pages/settings/SettingBuy.vue"
-import SettingShip from "@/pages/settings/SettingShip.vue"
-import DistributionIndex from "@/pages/distribution/DistributionIndex.vue"
-import DistributionSetting from "@/pages/distribution/DistributionSetting.vue"
-import ImageList from "@/pages/others/ImageList.vue"
-import NoticeList from "@/pages/others/NoticeList.vue"
 
 const cookie = useCookies()
 const routes = [
@@ -50,7 +30,7 @@ const dynamicRoutes = [
     {
         path: "/",
         name: "/",
-        component: Index,
+        component: () => import("@/pages/index.vue"),
         meta: {
             title: "主控台"
         },
@@ -58,7 +38,7 @@ const dynamicRoutes = [
     {
         path: "/goods/list",
         name: "/goods/list",
-        component: GoodsList,
+        component: ()=>import("@/pages/goods/GoodsList.vue"),
         meta: {
             title: "商品管理"
         },
@@ -66,7 +46,7 @@ const dynamicRoutes = [
     {
         path: "/category/list",
         name: "/category/list",
-        component: CategoryList,
+        component: ()=>import("@/pages/goods/CategoryList.vue"),
         meta: {
             title: "分类管理"
         },
@@ -74,7 +54,7 @@ const dynamicRoutes = [
     {
         path: "/skus/list",
         name: "/skus/list",
-        component: SkuList,
+        component: ()=>import("@/pages/goods/SkuList.vue"),
         meta: {
             title: "规格管理"
         },
@@ -82,7 +62,7 @@ const dynamicRoutes = [
     {
         path: "/coupon/list",
         name: "/coupon/list",
-        component: CouponList,
+        component: ()=>import("@/pages/goods/CouponList.vue"),
         meta: {
             title: "优惠券管理"
         },
@@ -90,7 +70,7 @@ const dynamicRoutes = [
     {
         path: "/user/list",
         name: "/user/list",
-        component: UserList,
+        component: ()=>import("@/pages/user/UserList.vue"),
         meta: {
             title: "用户管理"
         },
@@ -98,7 +78,7 @@ const dynamicRoutes = [
     {
         path: "/level/list",
         name: "/level/list",
-        component: LevelList,
+        component: ()=>import("@/pages/user/LevelList.vue"),
         meta: {
             title: "会员等级"
         },
@@ -106,7 +86,7 @@ const dynamicRoutes = [
     {
         path: "/order/list",
         name: "/order/list",
-        component: OrderList,
+        component: ()=>import("@/pages/order/OrderList.vue"),
         meta: {
             title: "订单管理"
         },
@@ -114,7 +94,7 @@ const dynamicRoutes = [
     {
         path: "/comment/list",
         name: "/comment/list",
-        component: CommentList,
+        component: ()=>import("@/pages/order/CommentList.vue"),
         meta: {
             title: "评论管理"
         },
@@ -122,7 +102,7 @@ const dynamicRoutes = [
     {
         path: "/manager/list",
         name: "/manager/list",
-        component: ManagerList,
+        component: ()=>import("@/pages/manager/ManagerList.vue"),
         meta: {
             title: "管理员管理"
         },
@@ -130,7 +110,7 @@ const dynamicRoutes = [
     {
         path: "/access/list",
         name: "/access/list",
-        component: AccessList,
+        component: ()=>import("@/pages/manager/AccessList.vue"),
         meta: {
             title: "权限管理"
         },
@@ -138,7 +118,7 @@ const dynamicRoutes = [
     {
         path: "/role/list",
         name: "/role/list",
-        component: RoleList,
+        component: ()=>import("@/pages/manager/RoleList.vue"),
         meta: {
             title: "角色管理"
         },
@@ -146,7 +126,7 @@ const dynamicRoutes = [
     {
         path: "/setting/base",
         name: "/setting/base",
-        component: SettingBase,
+        component: ()=>import("@/pages/settings/SettingBase.vue"),
         meta: {
             title: "基础管理"
         },
@@ -154,7 +134,7 @@ const dynamicRoutes = [
     {
         path: "/setting/buy",
         name: "/setting/buy",
-        component: SettingBuy,
+        component: ()=>import("@/pages/settings/SettingBuy.vue"),
         meta: {
             title: "交易管理"
         },
@@ -162,7 +142,7 @@ const dynamicRoutes = [
     {
         path: "/setting/ship",
         name: "/setting/ship",
-        component: SettingShip,
+        component: ()=>import("@/pages/settings/SettingShip.vue"),
         meta: {
             title: "物流管理"
         },
@@ -170,7 +150,7 @@ const dynamicRoutes = [
     {
         path: "/distribution/index",
         name: "/distribution/index",
-        component: DistributionIndex,
+        component: ()=>import("@/pages/distribution/DistributionIndex.vue"),
         meta: {
             title: "分销员管理"
         },
@@ -178,7 +158,7 @@ const dynamicRoutes = [
     {
         path: "/distribution/setting",
         name: "/distribution/setting",
-        component: DistributionSetting,
+        component: ()=>import("@/pages/distribution/DistributionSetting.vue"),
         meta: {
             title: "分销设置"
         },
@@ -186,7 +166,7 @@ const dynamicRoutes = [
     {
         path: "/image/list",
         name: "/image/list",
-        component: ImageList,
+        component: ()=>import("@/pages/others/ImageList.vue"),
         meta: {
             title: "图库管理"
         },
@@ -194,7 +174,7 @@ const dynamicRoutes = [
     {
         path: "/notice/list",
         name: "/notice/list",
-        component: NoticeList,
+        component: ()=>import("@/pages/others/NoticeList.vue"),
         meta: {
             title: "公告管理"
         },
@@ -211,7 +191,7 @@ function addRoutes(menus) {
     function findAndAddRoutes(arr) {
         arr.forEach((e) => {
             let item = dynamicRoutes.find(o => o.path == e.frontpath)
-            if (item && !router.hasRoute(item.path)) {
+            if (item && !router.hasRoute(item.name)) {
                 router.addRoute("admin", item)
                 hasNewRoutes = true
             }

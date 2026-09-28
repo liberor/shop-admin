@@ -2,7 +2,7 @@
     <el-card shadow="never">
         <template #header>
             <div class=" flex justify-between">
-                <div class=" text-sm">订单统计</div>
+                <div class=" text-[16px]">订单统计</div>
                 <div>
                     <el-check-tag v-for="(item, index) in options" :key="index" :checked="current == item.value"
                         @click="handleChoose(item.value)" class="mr-2">{{ item.text }}</el-check-tag>
@@ -10,7 +10,7 @@
             </div>
 
         </template>
-        <div id="chart" style="height: 300px;width: 100%;"></div>
+        <div id="chart" style="height: 450px;width: 100%;"></div>
     </el-card>
 </template>
 

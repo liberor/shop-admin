@@ -27,16 +27,16 @@
             <el-col v-for="(panel, index) in panels" :key="index" :span="6" :offset="0">
                 <el-card shadow="hover">
                     <template #header>
-                        <div class=" flex justify-between text-sm">
+                        <div class=" flex justify-between text-xl">
                             <span>{{ panel.title }}</span>
                             <el-tag :type="panel.unitColor || 'primary'">{{ panel.unit }}</el-tag>
                         </div>
                     </template>
                     <div class=" text-3xl font-bold text-gray-500">
-                        <CountTo :value="panel.value"></CountTo>
+                        <CountTo :value="panel.value" :tofixed="panel.title == '销售额' ? 2 : 0"></CountTo>
                     </div>
                     <el-divider></el-divider>
-                    <div class=" flex justify-between text-sm text-gray-500">
+                    <div class=" flex justify-between text-[16px] text-gray-500">
                         <span>{{ panel.subTitle }}</span>
                         <span>{{ panel.subValue }}</span>
                     </div>

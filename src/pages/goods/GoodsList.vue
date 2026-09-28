@@ -60,37 +60,37 @@
                 <el-table-column label="商品" width="300">
                     <template #default="{ row }">
                         <div class="flex">
-                            <el-image class="mr-3 rounded" :src="row.cover" fit="cover" :lazy="true" style="width: 50px;height: 50px;"></el-image>
-                            <div class="flex-1">
+                            <el-image class="mr-3 rounded" :src="row.cover" fit="cover" :lazy="true" style="width: 90px;height: 90px;"></el-image>
+                            <div class="flex-1 flex flex-col justify-between">
                                 <p>{{ row.title }}</p>
                                 <div>
                                     <span class="text-rose-500">${{ row.min_price }}</span>
                                     <el-divider direction="vertical"></el-divider>
-                                    <span class="text-gray-500 text-xs">${{ row.min_oprice }}</span>
+                                    <span class="text-gray-500 text-[14px]">${{ row.min_oprice }}</span>
                                 </div>
-                                <p class="text-gray-400 text-xs mb-1">分类:{{ row.category ? row.category.name : "未分类" }}</p>
+                                <p class="text-gray-400 text-[14px] mb-1">分类:{{ row.category ? row.category.name : "未分类" }}</p>
                                 <p class="text-gray-400 text-xs">创建时间:{{ row.create_time }}</p>
                             </div>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="实际销量" width="200" prop="sale_count" align="center">
+                <el-table-column label="实际销量" width="300" prop="sale_count"  align="center">
                 </el-table-column>
-                <el-table-column label="商品状态" width="150" align="center">
+                <el-table-column label="商品状态" width="350" align="center">
                     <template #default="{ row }">
-                        <el-tag :type="row.status ? 'success' : 'danger'" size="default">{{ row.status ? "上架" : "仓库" }}</el-tag>
+                        <el-tag :type="row.status ? 'success' : 'danger'" size="large" class="text-sm">{{ row.status ? "上架" : "仓库" }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column v-if="searchForm.tab != 'delete'" label="审核状态" width="220" align="center">
                     <template #default="{ row }">
                         <div class="check-status-table-column flex flex-col items-center" v-if="row.ischeck == 0">
-                            <el-button type="success" plain size="small" @click="handleCheckGoods(row.id,1)">审核通过</el-button>
-                            <el-button type="danger" plain class="mt-2" size="small" @click="handleCheckGoods(row.id,2)">审核拒绝</el-button>
+                            <el-button type="success" plain  @click="handleCheckGoods(row.id,1)">审核通过</el-button>
+                            <el-button type="danger" plain class="mt-2" @click="handleCheckGoods(row.id,2)">审核拒绝</el-button>
                         </div>
-                        <span v-else :class="{' text-green-400':row.ischeck == 1,' text-rose-400':row.ischeck == 2}">{{ row.ischeck == 1? '已通过':'已拒绝' }}</span>
+                        <span v-else :class="{' text-green-400':row.ischeck == 1,' text-rose-400':row.ischeck == 2,'text-[16px]':true}">{{ row.ischeck == 1? '已通过':'已拒绝' }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="总库存" width="150" prop="stock" align="center">
+                <el-table-column label="总库存" width="350" prop="stock" align="center">
                 </el-table-column>
                 <el-table-column label="操作" align="center">
                     <template #default="scope">
@@ -571,7 +571,7 @@ const addSkuCard = ()=>{
 //     })
 // }
 
-//修改规格选项
+//删除规格选项
 // const deleteSkuCard = ()=>{
 //     deleteGoodsSkusCard(  ).then(res=>{
 
@@ -596,6 +596,6 @@ const addSkuCard = ()=>{
     margin-left: 0 !important;
 }
 :deep(.operation-table-column .el-button) {
-    @apply px-1 !important;
+    @apply px-1 text-[16px] !important;
 }
 </style>

@@ -4,7 +4,7 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 import {router} from "@/router";
 import useLoginStore from "@/store/useLoginStore"
 const service = axios.create({
-    baseURL : "/api"
+    baseURL : import.meta.env.VITE_APP_BASE_API
 })
 const cookie = useCookies()
 service.interceptors.request.use(function (config) {
