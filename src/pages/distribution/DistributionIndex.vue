@@ -73,7 +73,7 @@
                         </el-avatar>
                     </template>
                 </el-table-column>
-                <el-table-column label="用户信息" width="210" >
+                <el-table-column label="用户信息" width="150" >
                     <template #default="{ row }">
                         <div class="text-xs">
                             <p>用户:{{ row.username ? row.username:'未知'}}</p>
@@ -90,7 +90,7 @@
                 <el-table-column label="已提现金额" width="150" prop="cash_out_price" align="center"></el-table-column>
                 <el-table-column label="提现次数" width="150" prop="cash_out_time" align="center"></el-table-column>
                 <el-table-column label="未提现金额" width="150" prop="no_cash_out_price" align="center"></el-table-column>
-                <el-table-column label="操作" align="center" fixed="right" width="200">
+                <el-table-column label="操作" align="center" fixed="right">
                     <template #default="scope">
                         <el-button type="primary" text @click="openDrawer(scope.row.id)">推广人</el-button>
                         <el-button type="primary" text @click="openDrawerOrder(scope.row.id)">推广订单</el-button>

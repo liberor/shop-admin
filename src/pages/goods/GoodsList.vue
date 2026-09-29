@@ -74,9 +74,9 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="实际销量" width="300" prop="sale_count"  align="center">
+                <el-table-column label="实际销量" width="120" prop="sale_count"  align="center">
                 </el-table-column>
-                <el-table-column label="商品状态" width="350" align="center">
+                <el-table-column label="商品状态" width="150" align="center">
                     <template #default="{ row }">
                         <el-tag :type="row.status ? 'success' : 'danger'" size="large" class="text-sm">{{ row.status ? "上架" : "仓库" }}</el-tag>
                     </template>
@@ -90,7 +90,7 @@
                         <span v-else :class="{' text-green-400':row.ischeck == 1,' text-rose-400':row.ischeck == 2,'text-[16px]':true}">{{ row.ischeck == 1? '已通过':'已拒绝' }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="总库存" width="350" prop="stock" align="center">
+                <el-table-column label="总库存" width="130" prop="stock" align="center">
                 </el-table-column>
                 <el-table-column label="操作" align="center">
                     <template #default="scope">
@@ -484,7 +484,12 @@ const openSkusDrawer=(row)=>{
     
     GoodsSkuStore.goods_skus_card = row.goods_skus_card
     GoodsSkuStore.goods_skus = row.goods_skus
+    GoodsSkuStore.update_pre_ids_to_skus()
+    GoodsSkuStore.update_skus_basedon_cards()
+    GoodsSkuStore.update_goods_skus_basedon_ids()
+    GoodsSkuStore.update_pre_ids_to_skus()
     skus_id = row.id
+    GoodsSkuStore.goods_id = row.id
     Skusform.value.sku_type = row.sku_type
     Skusform.value.sku_value = row.sku_value || {
         "oprice": 0,
@@ -499,7 +504,7 @@ const SkusOnSubmit = ()=>{
     updateGoodsSkus(skus_id,Skusform.value.sku_type == 0 ? Skusform.value : {sku_type:1,"goodsSkus":GoodsSkuStore.goods_skus}).then(res=>{
         ElMessage({
             type: 'success',
-            message: "设置规格成功"
+            message: "设置规格成功",
         })
         SkusDrawerRef.value.close()
         getData(current_page.value, searchForm.value)

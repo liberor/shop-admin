@@ -22,6 +22,19 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),],
+  optimizeDeps: {
+    include: [
+      'element-plus',
+      'echarts',
+      'gsap',
+      'tinymce',
+      '@tinymce/tinymce-vue',
+      'nprogress',
+      'axios',
+      '@vueuse/core',
+      '@vueuse/integrations',
+    ],
+  },
   server: {
     proxy: {
       // 选项写法
@@ -30,7 +43,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },
-    }
+    },
+    warmup: {
+      clientFiles: [
+        './src/pages/**/*.vue',
+        './src/components/**/*.vue',
+        './src/layouts/**/*.vue',
+      ],
+    },
   }
 
 })

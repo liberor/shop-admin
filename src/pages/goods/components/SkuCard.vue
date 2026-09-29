@@ -45,7 +45,8 @@
                 <el-col :span="6" style="min-width: 180px;max-width: 250px;" class="image-aside">
                     <div class="top" :style="{ height: 60 + 'vh', overflowY: 'auto' }">
                         <div class="aside-list-item" v-for="item in tableData" :key="item.id"
-                            :class="{ active: active?.id == item.id }" @click="if(active != item){checkList = []};active = item">
+                            :class="{ active: active?.id == item.id }"
+                            @click="if (active != item) { checkList = [] }; active = item">
                             <span class="truncate">{{ item.name }}</span>
                         </div>
                     </div>
@@ -57,7 +58,8 @@
                 <el-col style="flex:1;" class="image-main">
                     <div class="top px-5" :style="{ height: 60 + 'vh', overflowY: 'auto', overflowX: 'hidden' }">
                         <el-checkbox-group v-model="checkList">
-                            <el-checkbox size="large" v-for="(value,index) in valueArr" :key="index" :label="value" :value="value" style="width: 5vw;height: 3vh;"/>
+                            <el-checkbox size="large" v-for="(value, index) in valueArr" :key="index" :label="value"
+                                :value="value" style="width: 5vw;height: 3vh;" />
                         </el-checkbox-group>
                     </div>
                 </el-col>
@@ -75,15 +77,15 @@
 </template>
 
 <script lang="ts" setup>
-import {readGoods,
+import {
+    readGoods,
     updateGoodsSkus, createGoodsSkusCard, updateGoodsSkusCard, deleteGoodsSkusCard,
     sortGoodsSkusCard, updateGoodsSkusCardValue, deleteGoodsSkusCardValue, createGoodsSkusCardValue
 } from '@/api/goods';
 import { getSkusList } from '@/api/skus';
 import useGoodsSkuStore from '@/store/useGoodsSkuStore.js';
-import {cartesianProductOf} from '@/composables/utils'
 const GoodsSkuStore = useGoodsSkuStore()
-import { computed, nextTick, ref ,watch} from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 const inputValue = ref('')
 const inputRefs = ref({})
 const handleClose = (sku_value) => {
@@ -159,7 +161,7 @@ let current_page = ref(1)
 let total = ref(0)
 let active = ref(null)
 const checkList = ref([])
-const valueArr = computed(()=>{
+const valueArr = computed(() => {
     if (active.value == null) return [];
     return active.value.default.split(',')
 })
@@ -171,12 +173,12 @@ const getData = () => {
     })
 }
 getData()
-const handleSubmit = ()=>{
+const handleSubmit = () => {
     current_sku.value.name = active.value.name
     updateGoodsSkusCard(current_sku.value.id, current_sku.value)
-    for(let value of checkList.value){
+    for (let value of checkList.value) {
         if (value) {
-        createGoodsSkusCardValue({
+            createGoodsSkusCardValue({
                 "goods_skus_card_id": current_sku.value.id,
                 "name": current_sku.value.name,
                 "order": 50,
@@ -188,36 +190,11 @@ const handleSubmit = ()=>{
     }
     centerDialogVisible.value = false
 }
-watch(() => GoodsSkuStore.goods_skus_card, (val) => {
-    if(val.length == 0){
-        GoodsSkuStore.goods_skus = []
-    }else{
-        let arr = [];
-        for(let card of val){
-            const temp = card.goods_skus_card_value.map(item=>item);
-            if(temp.length > 0) arr.push(temp)
-        }
-        if(arr.length == 0){
-            GoodsSkuStore.goods_skus = [];
-            return
-        }
-        arr = cartesianProductOf(...arr );
-        GoodsSkuStore.goods_skus = [];
-        GoodsSkuStore.goods_skus = arr.map(o=>{
-            return {
-                code:'0',
-                cprice:'0.00',
-                goods_id:val.goods_id,
-                image:'',
-                oprice:'0.00',
-                pprice:'0.00',
-                stock:0,
-                volume:0,
-                weight:0,
-                skus:o
-            }
-        })
-    }
+
+watch(() => GoodsSkuStore.goods_skus_card, ( ) => {
+    GoodsSkuStore.update_skus_basedon_cards()
+    GoodsSkuStore.update_goods_skus_basedon_ids()
+    GoodsSkuStore.update_pre_ids_to_skus()
 }, { deep: true })
 </script>
 
@@ -264,6 +241,7 @@ watch(() => GoodsSkuStore.goods_skus_card, (val) => {
 .active {
     @apply bg-blue-50;
 }
+
 :deep(.el-checkbox.el-checkbox--large .el-checkbox__label) {
     font-size: 18px;
 }

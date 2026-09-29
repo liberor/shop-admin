@@ -15,7 +15,7 @@
             </div>
             <el-form ref="FormRef" :model="form" class=" w-[250px]" :rules="rules">
                 <el-form-item prop="username">
-                    <el-input v-model="form.username" placeholder="username">
+                    <el-input v-model="form.username" placeholder="admin">
                         <template #prefix>
                             <el-icon>
                                 <User />
@@ -24,7 +24,7 @@
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" show-password v-model="form.password" placeholder="password"
+                    <el-input type="password" show-password v-model="form.password" placeholder="admin"
                         :prefix-icon="Lock" />
                 </el-form-item>
                 <el-form-item>
