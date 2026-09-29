@@ -77,9 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-    readGoods,
-    updateGoodsSkus, createGoodsSkusCard, updateGoodsSkusCard, deleteGoodsSkusCard,
+import {updateGoodsSkusCard, deleteGoodsSkusCard,
     sortGoodsSkusCard, updateGoodsSkusCardValue, deleteGoodsSkusCardValue, createGoodsSkusCardValue
 } from '@/api/goods';
 import { getSkusList } from '@/api/skus';

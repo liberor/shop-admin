@@ -248,9 +248,7 @@
 <script lang="ts" setup>
 import { getCategoryList } from '@/api/category';
 import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods,readGoods,
-    setGoodsBanner,updateGoodsSkus,restoreGoods,destroyGoods,checkGoods,createGoodsSkusCard,updateGoodsSkusCard,
-    deleteGoodsSkusCard,sortGoodsSkusCard,updateGoodsSkusCardValue,deleteGoodsSkusCardValue,
-    createGoodsSkusCardValue } from '@/api/goods';
+    setGoodsBanner,updateGoodsSkus,restoreGoods,destroyGoods,checkGoods,createGoodsSkusCard } from '@/api/goods';
 import { ref, watch } from "vue"
 import { ElMessage, ElMessageBox } from 'element-plus';
 import FormDrawer from "@/components/FormDrawer.vue"

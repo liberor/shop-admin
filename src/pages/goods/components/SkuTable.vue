@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { readGoods ,updateGoodsSkus} from '@/api/goods';
+import { updateGoodsSkus} from '@/api/goods';
 import useGoodsSkuStore from '@/store/useGoodsSkuStore.js';
 import { onMounted } from 'vue';
 const GoodsSkuStore = useGoodsSkuStore()

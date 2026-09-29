@@ -43,7 +43,6 @@
 <script lang="ts" setup>
 import { getCategoryList, createCategory, updateCategory, updateCategoryStatus, deleteCategory } from '@/api/category';
 import FormDrawer from "@/components/FormDrawer.vue"
-import IconSelect from '@/components/IconSelect.vue';
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 let data = ref([])
