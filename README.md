@@ -118,7 +118,7 @@ src
 - **RBAC 权限体系**：登录后请求用户信息，依据后端返回的菜单权限（`menus`）匹配并动态 `addRoute` 挂载前端路由；按钮级权限通过自定义指令 `v-permission` 判断 `ruleNames`，无权限时移除对应元素。
 - **路由守卫**：`beforeEach` 中基于 cookie 中的 `admin-token` 做登录校验，配合 `nprogress` 展示加载进度，动态路由变化时重定向以生效。
 - **SKU 多规格联动**：使用**笛卡尔积算法**将多个规格项组合生成 SKU 表，实现规格的增删、排序、修改与表格数据实时联动（`useGoodsSkuStore`）。
-- **通用组件抽取**：`FormDrawer`、`TagInput`、`IconSelect`、`ChooseImage`、`ImagePanel`、`Editor` 等在多个业务页面复用，提升开发效率。
+- **通用组件抽取**：`FormDrawer`、`TagInput`、`IconSelect`、`ChooseImage`等在多个业务页面复用，提升开发效率。
 - **首屏优化**：路由懒加载 + Element Plus 按需引入，首屏 JS 体积由 **1.4MB 降至 240KB（-83%）**，加载时间由约 **6s 优化至约 2s**。
 
 ## 部署
