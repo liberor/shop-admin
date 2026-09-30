@@ -26,7 +26,7 @@
             </el-tooltip>
             <el-dropdown class="dropdown" @command="handleCommand">
                 <span class=" flex items-center text-light-50" style="outline: none;box-shadow: none;">
-                    <el-avatar class=" mr-2" :size="25" :src="LoginStore.user.avatar" />
+                    <el-avatar class=" mr-2" :size="25" :src="LoginStore.user.avatar" style="--el-avatar-bg-color: #409eff; --el-avatar-text-color: #fff;" >{{ LoginStore.user.username?.charAt(0) ?? 'A' }}</el-avatar>
                     {{ LoginStore.user.username }}
                     <el-icon class="el-icon--right">
                         <arrow-down />
