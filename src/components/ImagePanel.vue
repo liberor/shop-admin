@@ -67,9 +67,9 @@
                 <el-row v-else :gutter="15" style="padding: 20px;">
                     <div v-if="list_main.length == 0" class=" p-5 text-xl" style="text-align: center;width: 100%;">没有找到图片</div>
                     <el-col :span="6" :offset="0" v-for="item in list_main" :key="item.id" class="mb-3"
-                        style="min-width: 150px;">
+                        style="min-width: 180px;">
                         <el-card shadow="hover" :body-style="{ padding: '0px' }" class="relative" :class="{'border-blue-500':item.checked}">
-                            <el-image :src="item.url" fit="cover" style="height: 150px;width: 100%;"
+                            <el-image :src="item.url" fit="cover" style="height: 260px;width: 100%;"
                                 :preview-src-list="[item.url]" show-progress :initial-index="0"></el-image>
                             <div class="image-title">{{ item.name }}</div>
                             <div class="flex justify-center items-center p-2">
@@ -366,7 +366,7 @@ defineExpose({ formDrawerRef, form, drawerTitle , active ,current_page_main,getD
 .image-title {
     @apply bg-gray-800 bg-opacity-30 text-sm px-2 py-1 truncate text-light-100;
     position: absolute;
-    top: 122px;
+    bottom: 46px;
     left: 0;
     right: 0;
     text-align: center;
