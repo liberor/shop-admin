@@ -214,7 +214,7 @@ function addRoutes(menus) {
     return hasNewRoutes
 }
 
-router.beforeEach((to, from) => {
+router.beforeEach(async (to, from) => {
     nprogress.start()
     const token = cookie.get("admin-token")
     if (!token && to.path != "/login") {
@@ -226,11 +226,10 @@ router.beforeEach((to, from) => {
     let hasNewRoutes = false
     const LoginStore = useLoginStore()
     if (token && Object.keys(LoginStore.user).length == 0) {
-        getInfo().then(info => {
-            LoginStore.set_user_info(info)
-            hasNewRoutes = addRoutes(info.menus)
-            if (hasNewRoutes) router.push(to.fullPath)
-        })
+        const info = await getInfo()
+        LoginStore.set_user_info(info)
+        hasNewRoutes = addRoutes(info.menus)
+        if (hasNewRoutes) return { ...to, replace: true }
     }
 })
 
